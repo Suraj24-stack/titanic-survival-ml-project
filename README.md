@@ -28,32 +28,14 @@ Key highlights:
 
 ## 🔄 Complete Pipeline Flow & Architecture
 
-### Detailed Pipeline Stages
+The end-to-end pipeline follows a streamlined transformation and modeling process:
 
-1. **Data Ingestion & Cleaning**:
-   - Ingests `train.csv`.
-   - Drops non-predictive identifiers and high-cardinality/missing columns: `PassengerId`, `Name`, `Ticket`, and `Cabin`.
-   - Remaining feature set: `['Pclass', 'Sex', 'Age', 'SibSp', 'Parch', 'Fare', 'Embarked']`.
-2. **Train/Test Split**:
-   - Splits data into 80% training (`X_train`, `y_train`) and 20% testing (`X_test`, `y_test`) with `random_state=42`.
-3. **Transformer 1 (`trf1` - Imputation)**:
-   - Imputes missing `Age` values using mean strategy (`SimpleImputer()`).
-   - Imputes missing `Embarked` values using mode strategy (`SimpleImputer(strategy='most_frequent')`).
-   - Remaining columns are passed through without modification (`remainder='passthrough'`).
-4. **Transformer 2 (`trf2` - Categorical Encoding)**:
-   - Converts categorical variables `Sex` and `Embarked` into numerical representation using `OneHotEncoder(sparse_output=False, handle_unknown='ignore')`.
-5. **Transformer 3 (`trf3` - Feature Scaling)**:
-   - Scales numeric and one-hot encoded features to range `[0, 1]` using `MinMaxScaler()`.
-6. **Transformer 4 (`trf4` - Feature Selection)**:
-   - Selects the top $k=8$ most informative features using the Chi-Square test (`SelectKBest(score_func=chi2, k=8)`).
-7. **Transformer 5 (`trf5` - Classification Estimator)**:
-   - Trains a `DecisionTreeClassifier` on the transformed feature subset.
-8. **Evaluation & Tuning**:
-   - Evaluates using `accuracy_score` and 5-fold cross-validation (`cross_val_score`).
-   - Optimizes tree depth using `GridSearchCV` over `decisiontreeclassifier__max_depth: [1, 2, 3, 4, 5, None]`.
-9. **Export & Inference**:
-   - Serializes the entire end-to-end pipeline into `pipe.pkl` using Python's `pickle`.
-   - Real-time prediction is executed directly on raw NumPy arrays or DataFrames without manual preprocessing.
+1. **Data Cleaning & Split**: Drops non-predictive columns (`PassengerId`, `Name`, `Ticket`, `Cabin`) and performs an 80/20 train-test split.
+2. **Missing Value Imputation (`trf1`)**: Imputes `Age` with mean and `Embarked` with mode.
+3. **Categorical Encoding (`trf2`)**: One-Hot Encodes categorical features (`Sex`, `Embarked`).
+4. **Feature Scaling (`trf3`)**: Scales all features to `[0, 1]` using `MinMaxScaler`.
+5. **Feature Selection (`trf4`)**: Selects top 8 most informative features using Chi-Square (`SelectKBest`).
+6. **Model Training & Export (`trf5`)**: Fits a `DecisionTreeClassifier`, tunes with `GridSearchCV`, and exports the trained pipeline to `pipe.pkl`.
 
 ---
 
