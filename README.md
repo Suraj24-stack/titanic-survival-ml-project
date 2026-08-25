@@ -11,7 +11,6 @@ An end-to-end Machine Learning pipeline built with **Scikit-Learn** for predicti
 - [Project Directory Structure](#-project-directory-structure)
 - [How to Start & Run the Project](#-how-to-start--run-the-project)
 - [Input Feature Reference](#-input-feature-reference)
-- [Making Predictions with Serialized Pipeline](#-making-predictions-with-serialized-pipeline)
 - [Model Evaluation & Tuning](#-model-evaluation--tuning)
 
 ---
@@ -28,26 +27,6 @@ Key highlights:
 ---
 
 ## 🔄 Complete Pipeline Flow & Architecture
-
-```mermaid
-flowchart TD
-    A[Raw Input Data] --> B[Drop Non-Predictive Columns: PassengerId, Name, Ticket, Cabin]
-    B --> C[Train / Test Split 80/20]
-    C --> D[ML Pipeline: pipe]
-    
-    subgraph Pipeline Steps
-        D --> E[Step 1: trf1 - SimpleImputer<br>Age: Mean | Embarked: Most Frequent]
-        E --> F[Step 2: trf2 - OneHotEncoder<br>Encode Sex & Embarked]
-        F --> G[Step 3: trf3 - MinMaxScaler<br>Scale All Features]
-        G --> H[Step 4: trf4 - SelectKBest chi2<br>Select Top 8 Features]
-        H --> I[Step 5: trf5 - DecisionTreeClassifier<br>Model Training & Classification]
-    end
-
-    I --> J[Hyperparameter Tuning: GridSearchCV]
-    I --> K[Cross-Validation: 5-Fold CV]
-    I --> L[Export: pipe.pkl]
-    L --> M[Inference: predict-using-pipeline.ipynb]
-```
 
 ### Detailed Pipeline Stages
 
@@ -80,17 +59,17 @@ flowchart TD
 
 ## ⚙️ Algorithms & Techniques Used
 
-| Component / Task | Algorithm / Technique | Library | Purpose |
-| :--- | :--- | :--- | :--- |
-| **Missing Value Imputation** | Mean Imputation & Most Frequent (Mode) | `sklearn.impute.SimpleImputer` | Handles missing values in `Age` and `Embarked` |
-| **Categorical Encoding** | One-Hot Encoding (OHE) | `sklearn.preprocessing.OneHotEncoder` | Converts `Sex` and `Embarked` to binary dummy variables |
-| **Feature Scaling** | Min-Max Normalization | `sklearn.preprocessing.MinMaxScaler` | Normalizes values into $[0, 1]$ interval |
-| **Feature Selection** | Chi-Square ($\chi^2$) Independence Test | `sklearn.feature_selection.SelectKBest`, `chi2` | Selects $k=8$ most statistically significant features |
-| **Classification Model** | Decision Tree Classifier | `sklearn.tree.DecisionTreeClassifier` | Non-linear tree-based binary classification |
-| **Pipeline Construction** | Pipeline & Column Transformer | `sklearn.pipeline.make_pipeline`, `ColumnTransformer` | Chains preprocessing and modeling steps to avoid data leakage |
-| **Hyperparameter Optimization** | Grid Search Cross-Validation | `sklearn.model_selection.GridSearchCV` | Finds the best `max_depth` parameter |
-| **Cross-Validation** | K-Fold Stratified CV ($k=5$) | `sklearn.model_selection.cross_val_score` | Estimates model generalization performance |
-| **Model Serialization** | Object Serialization | `pickle` | Saves trained pipeline for production deployment |
+| Component / Task | Algorithm / Technique | Purpose |
+| :--- | :--- | :--- |
+| **Missing Value Imputation** | Mean Imputation & Most Frequent (Mode) | Handles missing values in `Age` and `Embarked` |
+| **Categorical Encoding** | One-Hot Encoding (OHE) | Converts `Sex` and `Embarked` to binary dummy variables |
+| **Feature Scaling** | Min-Max Normalization | Normalizes values into $[0, 1]$ interval |
+| **Feature Selection** | Chi-Square ($\chi^2$) Independence Test | Selects $k=8$ most statistically significant features |
+| **Classification Model** | Decision Tree Classifier | Non-linear tree-based binary classification |
+| **Pipeline Construction** | Pipeline & Column Transformer | Chains preprocessing and modeling steps to avoid data leakage |
+| **Hyperparameter Optimization** | Grid Search Cross-Validation | Finds the best `max_depth` parameter |
+| **Cross-Validation** | K-Fold Stratified CV ($k=5$) | Estimates model generalization performance |
+| **Model Serialization** | Object Serialization | Saves trained pipeline for production deployment |
 
 ---
 
@@ -171,33 +150,6 @@ When providing raw input for inference, the pipeline expects the following 7 fea
 
 ---
 
-## 🔮 Making Predictions with Serialized Pipeline
-
-You can load `pipe.pkl` in any Python script to make immediate predictions on raw passenger data:
-
-```python
-import pickle
-import numpy as np
-import warnings
-
-warnings.filterwarnings("ignore", category=UserWarning)
-
-# 1. Load the trained pipeline
-with open('pipe.pkl', 'rb') as f:
-    pipe = pickle.load(f)
-
-# 2. Define raw passenger input [Pclass, Sex, Age, SibSp, Parch, Fare, Embarked]
-sample_passenger = np.array([2, 'male', 31.0, 0, 0, 10.5, 'S'], dtype=object).reshape(1, 7)
-
-# 3. Predict survival
-prediction = pipe.predict(sample_passenger)
-result = "Survived" if prediction[0] == 1 else "Did Not Survive"
-
-print(f"Prediction: {prediction[0]} -> Passenger {result}")
-```
-
----
-
 ## 📈 Model Evaluation & Tuning
 
 - **Baseline Cross-Validation**: Evaluated using 5-fold CV (`cross_val_score`) to measure out-of-fold generalization.
@@ -208,7 +160,7 @@ print(f"Prediction: {prediction[0]} -> Passenger {result}")
 
 ---
 
-## � Author
+## 👤 Author
 
 - **Suraj Khadka**
 
